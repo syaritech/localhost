@@ -1,0 +1,39 @@
+services:
+  mariadb:
+    image: mariadb:11.3
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-password}
+    ports:
+      - "${MARIADB_PORT:-3306}:3306"
+    networks:
+      - localhost
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  adminer:
+    image: adminer:4.8.1
+    restart: always
+    ports:
+      - "${ADMINER_PORT:-8080}:8080"
+    networks:
+      - localhost
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  mariadb-data:
+
+networks:
+  localhost:
+    name: localhost
+    external: true
+    driver: bridge
